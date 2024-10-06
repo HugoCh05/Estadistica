@@ -1,0 +1,127 @@
+# Práctica 1: Estadísticas descriptiva
+
+---
+date: "Estadística - Curso 2023/2024"
+
+output: 
+  bookdown::html_document2:
+    toc: yes
+    toc_float: yes
+  bookdown::pdf_document2:
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE, purl=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      eval = TRUE, 
+                      warning = FALSE,
+                      message = FALSE,
+                      error = TRUE)
+```
+
+# Introducción
+
+En esta practica se busca observar los datos obtenidos sobre un estudio del sueño y viendo que factores afectan más al sueño segun el genero, la edad, profecione etc.
+
+Para realizar nuestro analisis hemos utilizado las siguientes librerias:
+
+```{r}
+library(tidyverse)
+datos2 <- read.csv("Sleep_health_and_lifestyle_dataset.csv") 
+```
+
+# Diccionario de datos
+
+-   `Person ID`: Un identificador para cada individuo.
+-   `Gender`: El género de la persona (Masculino/Femenino).
+-   `Age`: La edad de la persona en años.
+-   `Occupation`: La ocupación o profesión de la persona.
+-   `Sleep Duration`: (horas) El número de horas que la persona duerme al día.
+-   `Quality of Sleep`: Una valoración subjetiva de la calidad del sueño, en una escala del 1 al 10.
+-   `Physical Acticity Level`: Una valoración subjetiva del nivel de estrés experimentado
+-   `Stress Level`: Una valoración subjetiva del nivel de estrés experimentado por la persona, en una escala del 1 al 10.
+-   `BMI Category`: La categoría de BMI de la persona (por ejemplo, Bajo peso, Normal, Sobrepeso).
+-   `Blood Pressure`:La medición de la presión arterial de la persona, indicada como presión sistólica sobre presión diastólica.
+-   `Heart Rate`: La frecuencia cardíaca en reposo de la persona en pulsaciones por minuto.
+-   `Daily Steps`:El número de pasos que la persona da al día.
+-   `Sleep Disorder`: La presencia o ausencia de un trastorno del sueño en la persona (Ninguno, Insomnio, Apnea del Sueño).
+
+# Análisis exploratorio de datos
+
+## Datos univariantes
+
+### Hombres y mujeres participantes en el estudio
+
+```{r}
+datos2|>count(Gender)
+datos2 |> 
+  ggplot(aes(x = Gender)) +
+  geom_bar(fill = "#9dcb43") +
+  theme_bw() + 
+  labs(title = "Genero", 
+       x = "Sexo",
+       y = "Frecuencia absoluta")
+```
+
+### Edades
+
+```{r}
+
+rango <- max(datos2$Age) - min(datos2$Age)
+k <- round(rango / 5, 0)
+limites <- seq(40, 40 + 5 * k, by = k)
+limAge <- cut(datos2$Age, breaks = limites, right = TRUE)
+
+datos2$Age <- cut(datos2$Age, breaks = c(0, 18, 25, 30, 35, 40, 45, 55, 60), 
+                  labels = c('0-17', '18-24.9', '25-29.9', '30-34.9', '35-39.9', '40-44.9', '45-54.9', '55-60'))
+
+datos2 |> ggplot(aes(x = Age)) +   
+    geom_bar(fill = "#9dcb43", col = "white") +   
+    theme_bw() 
+```
+
+### Profesiones
+
+```{r}
+datos2|>count(Occupation)
+datos2 |> 
+  ggplot(aes(x = Occupation)) +
+  geom_bar(fill = "#9dcb43") +
+  theme_bw() + 
+  labs(title = "Genero", 
+       x = "Profesion",
+       y = "Frecuencia absoluta")
+```
+
+### Tablas de frecuencias
+
+## Datos bivariantes
+
+### Edad con horas de sueño
+
+### Trastornos con la edad
+
+### Profesion con estres
+
+### Estres calidad de sueño
+
+### Profesion con BMI
+
+### BMI con presion
+
+### Horas de sueño con trastorno
+
+### Pasos diarios con BMI
+
+### Genero con trastornos
+
+### Calidad de sueño con estres
+
+### Actividad diaria con BMI
+
+### Presion pulso BMI
+
+### Trastorno trabajo
+
+# Conclusiones

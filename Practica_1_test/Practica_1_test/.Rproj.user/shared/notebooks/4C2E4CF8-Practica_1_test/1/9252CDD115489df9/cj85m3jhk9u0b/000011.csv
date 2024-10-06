@@ -1,0 +1,7 @@
+"0","datos2 |> "
+"0","  ggplot(aes(x = Occupation)) +"
+"0","  geom_bar(fill = ""#9dcb43"") +"
+"0","  theme_bw() + "
+"0","  labs(title = ""Genero"", "
+"0","       x = ""Profesion"","
+"0","       y = ""Frecuencia absoluta"")"

@@ -1,0 +1,13 @@
+#  Práctica 1: Estadísticas descriptiva
+
+#  Introducción
+#  Importación y definición de paquetes
+
+dataset <- readxl::read_excel("dataset.xlsx")
+library(tidyverse)
+
+#  Diccionarios de datos
+#  Análisis exploratorio de datos
+##  Datos univariantes
+##  Datos bivariantes
+#  Conclusiones

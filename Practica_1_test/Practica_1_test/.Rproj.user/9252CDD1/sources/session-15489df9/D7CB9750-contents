@@ -1,0 +1,15 @@
+datos <- read.csv("Sleep_health_and_lifestyle_dataset.csv") 
+# Analis bivariante
+### Edad con horas de sueño
+### Trastornos con la edad
+### Profesion con estres
+### Estres calidad de sueño
+### Profesion con BMI
+### BMI con presion
+### Horas de sueño con trastorno
+### Pasos diarios con BMI
+### Genero con trastornos
+### Calidad de  sueño con estres
+### Actividad diaria con BMI
+### Presion pulso BMI
+### Trastorno trabajo
