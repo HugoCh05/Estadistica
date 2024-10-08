@@ -63,7 +63,9 @@ datos2 |>
        x = "Sexo",
        y = "Frecuencia absoluta")
 ```
+
 ### Edades
+
 ```{r}
 
 rango <- max(datos2$Age) - min(datos2$Age)
@@ -78,6 +80,7 @@ datos2 |> ggplot(aes(x = Age)) +
     geom_bar(fill = "#9dcb43", col = "white") +   
     theme_bw() 
 ```
+
 ### Profesiones
 
 ```{r}
@@ -90,23 +93,108 @@ datos2 |>
        x = "Profesion",
        y = "Frecuencia absoluta")
 ```
-### Tablas de frecuencias
+
+### Nivel de estrés de los participantes
+
+```{r}
+datos2|>count(Stress.Level)
+datos2 |> 
+  ggplot(aes(x = Stress.Level)) +
+  geom_bar(fill = "#9dcb43") +
+  theme_bw() + 
+  labs(title = "Niveles de estrés", 
+       x = "Nivel",
+       y = "Frecuencia absoluta")
+```
+
+```{r}
+tabla_frecuencias <- datos2 |> 
+  count(Stress.Level) |> 
+  mutate(f = n/nrow(datos2),
+         N = cumsum(n),
+         F = cumsum(f)) 
+knitr::kable(tabla_frecuencias, digits = 4)
+
+```
+
+Como podemos ver, los participantes del estudio tenían sobre todo niveles de estres por encima del 2, pero va disminuyendo conforme aumenta hasta el "6". A partir de ahí, se aprecia un ligero crecimiento en el "7" y uno mayor en el "8". De ese número en adelante no hay participantes.
+
+Teniendo en cuenta este analisis podemos observar que no hay participantes en los extremos del nivel de estrés, estando así medianamente equilibrado pero con suficiente variación como para comprobar si el alto estrés afecta al sueño.
+
+### Categoría del IMC de los participantes
+
+```{r}
+datos2|>count(BMI.Category)
+datos2 |> 
+  ggplot(aes(x = BMI.Category)) +
+  geom_bar(fill = "#9dcb43") +
+  theme_bw() + 
+  labs(title = "Categoría del IMC", 
+       x = "IMC",
+       y = "Frecuencia absoluta")
+```
+
+```{r}
+tabla_frecuencias <- datos2 |> 
+  count(BMI.Category) |> 
+  mutate(f = n/nrow(datos2),
+         N = cumsum(n),
+         F = cumsum(f)) 
+knitr::kable(tabla_frecuencias, digits = 4)
+
+```
+
+Como se puede observar, los participantes están, en su mayoría, en un peso IMC normal, sin embargo también podemos encontrar un gran número de estos con sobrepeso, por lo que en el estudio se podrá comprobar claramente si el sobrepeso afecta al sueño.
+
+### Presión sanguínea de los participantes
+
+```{r}
+datos2 |> 
+  mutate(Blood.Pressure = fct_rev(as_factor(Blood.Pressure))) |> 
+  ggplot(aes(y = Blood.Pressure)) +
+  geom_bar(fill = "#9dcb43") +
+  theme_bw() +
+  labs(title = "Niveles de presión",
+       x = expression("Frecuencia absoluta ("*n[i]*")"),
+       y = "Niveles")
+```
+
+```{r}
+tabla_frecuencias <- datos2 |> 
+  count(Blood.Pressure) |> 
+  mutate(f = n/nrow(datos2),
+         N = cumsum(n),
+         F = cumsum(f)) 
+knitr::kable(tabla_frecuencias, digits = 4)
+
+```
 
 ## Datos bivariantes
 
 ### Edad con horas de sueño
-### Trastornos con la edad
-### Profesion con estres
-### Estres calidad de sueño
-### Profesion con BMI
-### BMI con presion
-### Horas de sueño con trastorno
-### Pasos diarios con BMI
-### Genero con trastornos
-### Calidad de  sueño con estres
-### Actividad diaria con BMI
-### Presion pulso BMI
-### Trastorno trabajo
 
+### Trastornos con la edad
+
+### Profesion con estres
+
+### Estres calidad de sueño
+
+### Profesion con BMI
+
+### BMI con presion
+
+### Horas de sueño con trastorno
+
+### Pasos diarios con BMI
+
+### Genero con trastornos
+
+### Calidad de sueño con estres
+
+### Actividad diaria con BMI
+
+### Presion pulso BMI
+
+### Trastorno trabajo
 
 # Conclusiones
