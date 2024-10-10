@@ -169,6 +169,66 @@ knitr::kable(tabla_frecuencias, digits = 4)
 
 ```
 
+## Frecuencia Cardiaca
+
+```{r}
+summary(datos2$Heart.Rate)
+datos2|>count(Heart.Rate)
+# Histograma para observar la distribución de la frecuencia cardiaca
+datos2 |> 
+  ggplot(aes(x = Heart.Rate)) +
+  geom_histogram(fill = "#9dcb43", bins = 21, color = "white") +
+  theme_bw() +
+  labs(title = "Distribución de la Frecuencia Cardiaca", 
+       x = "Frecuencia Cardiaca (bpm)", 
+       y = "Frecuencia Absoluta")
+```
+```{r}
+tabla_frecuencias_cardiaca <- datos2 |> 
+  count(Heart.Rate) |> 
+  mutate(f = n/nrow(datos2),
+         N = cumsum(n),
+         F = cumsum(f)) 
+knitr::kable(tabla_frecuencias_cardiaca, digits = 4)
+
+```
+
+### Pasos diarios con BMI
+```{r}
+rango <- max(datos2$Daily.Steps) - min(datos2$Daily.Steps)
+k <- round(rango / 5, 0)
+limit <- seq(0, max(datos2$Daily.Steps), by = k)
+
+datos2$Daily.Steps <- cut(datos2$Daily.Steps, breaks = c(0, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000), 
+                  labels = c('~3000', '~4000', '~5000', '~6000', '~7000', '~8000', '~9000', '10000'))
+
+datos2 |> ggplot(aes(x = Daily.Steps)) +   
+    geom_bar(fill = "#9dcb43", col = "white") +   
+    theme_bw() +
+    labs(title = "Distribución de Pasos Diarios",
+       x = expression("Pasos Diarios"),
+       y = "Frecuencia Absoluta")
+```
+```{r}
+tabla_frecuencias_pasos <- datos2 |> 
+  count(Daily.Steps) |> 
+  mutate(f = n/nrow(datos2),
+         N = cumsum(n),
+         F = cumsum(f)) 
+knitr::kable(tabla_frecuencias_pasos, digits = 4)
+
+```
+### Transtornos de Sueño
+```{r}
+datos2|>count(Sleep.Disorder)
+datos2 |> 
+  ggplot(aes(x = Sleep.Disorder)) +
+  geom_bar(fill = "#9dcb43") +
+  theme_bw() + 
+  labs(title = "Transtornos del Sueño", 
+       x = "Tipos de Transtornos",
+       y = "Frecuencia absoluta")
+```
 ## Datos bivariantes
 
 ### Edad con horas de sueño
