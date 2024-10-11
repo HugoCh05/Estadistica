@@ -1,7 +1,12 @@
-# Práctica 1: Estadísticas descriptiva
+---
+output:
+  bookdown::html_document2: default
+  html_document: default
+---
+# Práctica 1: Estadísticas descriptivas
 
 ---
-date: "Estadística - Curso 2023/2024"
+date: "Estadística - Curso 2024/2025"
 
 output: 
   bookdown::html_document2:
@@ -22,12 +27,19 @@ knitr::opts_chunk$set(echo = TRUE,
 
 # Introducción
 
-En esta practica se busca observar los datos obtenidos sobre un estudio del sueño y viendo que factores afectan más al sueño segun el genero, la edad, profecione etc.
+El principal obletivo de este estudio es conocer que factores afectan más al desarrollo de trastornos de sueño o no desarrollarlos. Para realizar el estudio se ha descartado Person,ID ya que no es relevante para el estudio, debido a que su funcion es enumerar el total de encuestados. Las variables a analizar como la edad, la profesión, actividad física... Son factoes que afectan a los sujetos estudiados y observaremos su relación o como se afectan entre sí y al diagnostico recivido.
 
-Para realizar nuestro analisis hemos utilizado las siguientes librerias:
+Para realizar nuestro análisis hemos utilizado las siguientes librerías:
+
+# Importación de datos y carga de paquetes
 
 ```{r}
 library(tidyverse)
+library(flextable)
+library(summarytools)  
+library(knitr)  
+library(GGally)
+
 datos2 <- read.csv("Sleep_health_and_lifestyle_dataset.csv") 
 ```
 
@@ -42,7 +54,7 @@ datos2 <- read.csv("Sleep_health_and_lifestyle_dataset.csv")
 -   `Physical Acticity Level`: Una valoración subjetiva del nivel de estrés experimentado
 -   `Stress Level`: Una valoración subjetiva del nivel de estrés experimentado por la persona, en una escala del 1 al 10.
 -   `BMI Category`: La categoría de BMI de la persona (por ejemplo, Bajo peso, Normal, Sobrepeso).
--   `Blood Pressure`:La medición de la presión arterial de la persona, indicada como presión sistólica sobre presión diastólica.
+-   `Blood Pressure`:La medición de la presión arterial de la persona en formato sistólica/diastólica.
 -   `Heart Rate`: La frecuencia cardíaca en reposo de la persona en pulsaciones por minuto.
 -   `Daily Steps`:El número de pasos que la persona da al día.
 -   `Sleep Disorder`: La presencia o ausencia de un trastorno del sueño en la persona (Ninguno, Insomnio, Apnea del Sueño).
@@ -54,7 +66,7 @@ datos2 <- read.csv("Sleep_health_and_lifestyle_dataset.csv")
 ### Hombres y mujeres participantes en el estudio
 
 ```{r}
-datos2|>count(Gender)
+
 datos2 |> 
   ggplot(aes(x = Gender)) +
   geom_bar(fill = "#9dcb43") +
@@ -62,59 +74,245 @@ datos2 |>
   labs(title = "Genero", 
        x = "Sexo",
        y = "Frecuencia absoluta")
+
+tabla_frecuencias_genero <- datos2 |> 
+
+  count(Gender)|>
+  
+  mutate(
+    N = cumsum(n),              
+    f = round(n / nrow(datos2), 4), 
+    F = round(cumsum(f), 4)         
+  )
+
+flextable(tabla_frecuencias_genero) |>
+   flextable::set_header_labels(
+      Freq = "n",
+      f = "Frecuencia Relativa",
+      N = "Frecuencia Acumulada",
+      F = "Frecuencia Relativa Acumulada"
+  )
+
 ```
+
+Los datos nos muestra que hay un número aproximado de hombres y mujeres aunque si los resultados se basan en el geneno al haber un leve numero mayor de hombres puede inclinar la balanza a su favor.Gracias a las graficas conocemos un total de 185 mujeres y 189 hombres. 
 
 ### Edades
 
 ```{r}
+tabla_frecuencias_edad <- datos2 |> 
 
-rango <- max(datos2$Age) - min(datos2$Age)
-k <- round(rango / 5, 0)
-limites <- seq(40, 40 + 5 * k, by = k)
-limAge <- cut(datos2$Age, breaks = limites, right = TRUE)
+  count(Age)|>
+  
+  mutate(
+    N = cumsum(n),              
+    f = round(n / nrow(datos2), 4), 
+    F = round(cumsum(f), 4)         
+  )
 
-datos2$Age <- cut(datos2$Age, breaks = c(0, 18, 25, 30, 35, 40, 45, 55, 60), 
-                  labels = c('0-17', '18-24.9', '25-29.9', '30-34.9', '35-39.9', '40-44.9', '45-54.9', '55-60'))
+flextable(tabla_frecuencias_edad) |>
+   flextable::set_header_labels(
+      Var1 = "Edad",
+      Freq = "n",
+      f = "Frecuencia Relativa",
+      N = "Frecuencia Acumulada",
+      F = "Frecuencia Relativa Acumulada"
+  )
+datos2 |> ggplot(aes(x=Age)) +
+  
+  geom_histogram(
+    fill = "#9dcb43",  
+    bins = 15,           
+    col = "white"       
+  ) +
+  
+  theme_bw()
 
-datos2 |> ggplot(aes(x = Age)) +   
-    geom_bar(fill = "#9dcb43", col = "white") +   
-    theme_bw() 
+datos2 |> descr(Age)
+summary(datos2$Age)
 ```
+
+El estudio se ha centrado en sujetos de edad adulta entre los 27 y los 59 años, con una media de edad en el estudio de 42.18. Y se puede observar que la el mayor número de encuestados tiene una edad cerca a los 40.
 
 ### Profesiones
 
 ```{r}
-datos2|>count(Occupation)
+
+tabla_frecuencias_profesion <- datos2 |> 
+
+  count(Occupation)|>
+  
+  mutate(
+    N = cumsum(n),              
+    f = round(n / nrow(datos2), 4), 
+    F = round(cumsum(f), 4)         
+  )
+
+flextable(tabla_frecuencias_profesion) |>
+   flextable::set_header_labels(
+      Freq = "n",
+      f = "Frecuencia Relativa",
+      N = "Frecuencia Acumulada",
+      F = "Frecuencia Relativa Acumulada"
+  )
+
 datos2 |> 
   ggplot(aes(x = Occupation)) +
   geom_bar(fill = "#9dcb43") +
   theme_bw() + 
-  labs(title = "Genero", 
-       x = "Profesion",
-       y = "Frecuencia absoluta")
+  labs(title = "Género", 
+       x = "Profesión",
+       y = "Frecuencia absoluta")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
 ```
+
+Los sujetos mas encuestados para el estudio han sido doctores y enfermeras con un total de 73 enfermeras y 71 médicos. Duración de sueño
+
+### Duración de sueño
+
+```{r}
+datos2['Duración_sueño'] <- cut(datos2$Sleep.Duration, breaks = c(5.5, 6, 6.5, 7, 7.5, 8, 8.5), 
+                  labels = c('5,5-6', '6-6,5', '6,5-7', '7-7,5', '7,5-8', '8-8,5'))
+
+
+
+tabla_frecuencias_duracion_sueño <- datos2 |> 
+
+  count(Duración_sueño)|>
+  
+  mutate(
+    N = cumsum(n),              
+    f = round(n / nrow(datos2), 4), 
+    F = round(cumsum(f), 4)
+  )
+
+flextable(tabla_frecuencias_duracion_sueño) |>
+   flextable::set_header_labels(
+      Var1 = "Duración",
+      Freq = "n",
+      f = "Frecuencia Relativa",
+      N = "Frecuencia Acumulada",
+      F = "Frecuencia Relativa Acumulada"
+  )
+datos2 |> ggplot(aes(x = Duración_sueño)) +   
+    geom_bar(fill = "#9dcb43", col = "white") +   
+    theme_bw()
+
+datos2 |> descr(Sleep.Duration)
+summary(datos2$Sleep.Duration)
+```
+
+Teniendo en cuenta que el sueño mínimo recomendado en adultos son 7 horas, podemos ver que aproximadamente un 40% de los individuos de la muestra no duermen suficientes horas.
+
+### Calidad de sueño
+
+```{r}
+
+tabla_frecuencias_calidad_sueño <- datos2 |> 
+
+  count(Quality.of.Sleep)|>
+  
+  mutate(
+    N = cumsum(n),              
+    f = round(n / nrow(datos2), 4), 
+    F = round(cumsum(f), 4)
+  )
+
+flextable(tabla_frecuencias_duracion_sueño) |>
+   flextable::set_header_labels(
+      Var1 = "Calidad",
+      Freq = "n",
+      f = "Frecuencia Relativa",
+      N = "Frecuencia Acumulada",
+      F = "Frecuencia Relativa Acumulada"
+  )
+datos2 |> 
+  ggplot(aes(x = Quality.of.Sleep)) +
+  geom_bar(fill = "#9dcb43") +
+  theme_bw() + 
+  labs(title = "Calidad de sueño", 
+       x = "Nivel",
+       y = "Frecuencia absoluta")
+datos2 |> descr(Quality.of.Sleep)
+summary(datos2$Quality.of.Sleep)
+```
+
+La gran mayoría de los resultados se agrupan en los niveles 6, 7 y 8, siendo poco comunes las puntuaciones por encima de esos valores y, especialmente, por debajo.
+
+### Nivel de actividad física
+
+```{r}
+tabla_frecuencias_actividad_física <- datos2 |> 
+
+  count(Physical.Activity.Level)|>
+  
+  mutate(
+    N = cumsum(n),              
+    f = round(n / nrow(datos2), 4), 
+    F = round(cumsum(f), 4)
+  )
+
+flextable(tabla_frecuencias_actividad_física) |>
+   flextable::set_header_labels(
+      Var1 = "Actividad",
+      Freq = "n",
+      f = "Frecuencia Relativa",
+      N = "Frecuencia Acumulada",
+      F = "Frecuencia Relativa Acumulada"
+  )
+datos2 |> ggplot(aes(Physical.Activity.Level)) +
+  
+  geom_histogram(
+    fill = "#9dcb43",  
+    bins = 5,           
+    col = "white"        
+  ) +
+  
+  
+  theme_bw()
+datos2 |> descr(Physical.Activity.Level)
+summary(datos2$Physical.Activity.Level)
+```
+
+El nivel de actividad física se reparte de manera más o menos equitativa a lo largo de la muestra, lo que significa que hay una gran variedad de resultados y que no hay una clara mayoría.
 
 ### Nivel de estrés de los participantes
 
 ```{r}
-datos2|>count(Stress.Level)
-datos2 |> 
-  ggplot(aes(x = Stress.Level)) +
-  geom_bar(fill = "#9dcb43") +
-  theme_bw() + 
-  labs(title = "Niveles de estrés", 
-       x = "Nivel",
-       y = "Frecuencia absoluta")
-```
+tabla_frecuencias_estres <- datos2 |> 
 
-```{r}
-tabla_frecuencias <- datos2 |> 
-  count(Stress.Level) |> 
-  mutate(f = n/nrow(datos2),
-         N = cumsum(n),
-         F = cumsum(f)) 
-knitr::kable(tabla_frecuencias, digits = 4)
+  count(Stress.Level)|>
+  
+  mutate(
+    N = cumsum(n),              
+    f = round(n / nrow(datos2), 4), 
+    F = round(cumsum(f), 4)         
+  )
 
+flextable(tabla_frecuencias_estres) |>
+   flextable::set_header_labels(
+      Var1 = "Estrés",
+      Freq = "n",
+      f = "Frecuencia Relativa",
+      N = "Frecuencia Acumulada",
+      F = "Frecuencia Relativa Acumulada"
+  )
+datos2 |> ggplot(aes(x=Stress.Level)) +
+  
+  geom_histogram(
+    fill = "#9dcb43",  
+    bins = 6,           
+    col = "white"       
+  ) +
+  
+  theme_bw()
+
+datos2 |> descr(Stress.Level)
+summary(datos2$Stress.Level)
 ```
 
 Como podemos ver, los participantes del estudio tenían sobre todo niveles de estres por encima del 2, pero va disminuyendo conforme aumenta hasta el "6". A partir de ahí, se aprecia un ligero crecimiento en el "7" y uno mayor en el "8". De ese número en adelante no hay participantes.
@@ -124,7 +322,25 @@ Teniendo en cuenta este analisis podemos observar que no hay participantes en lo
 ### Categoría del IMC de los participantes
 
 ```{r}
-datos2|>count(BMI.Category)
+
+tabla_frecuencias_IMC <- datos2 |> 
+
+  count(BMI.Category)|>
+  
+  mutate(
+    N = cumsum(n),              
+    f = round(n / nrow(datos2), 4), 
+    F = round(cumsum(f), 4)         
+  )
+
+flextable(tabla_frecuencias_IMC) |>
+   flextable::set_header_labels(
+      Freq = "n",
+      f = "Frecuencia Relativa",
+      N = "Frecuencia Acumulada",
+      F = "Frecuencia Relativa Acumulada"
+  )
+
 datos2 |> 
   ggplot(aes(x = BMI.Category)) +
   geom_bar(fill = "#9dcb43") +
@@ -132,15 +348,9 @@ datos2 |>
   labs(title = "Categoría del IMC", 
        x = "IMC",
        y = "Frecuencia absoluta")
-```
 
-```{r}
-tabla_frecuencias <- datos2 |> 
-  count(BMI.Category) |> 
-  mutate(f = n/nrow(datos2),
-         N = cumsum(n),
-         F = cumsum(f)) 
-knitr::kable(tabla_frecuencias, digits = 4)
+
+
 
 ```
 
@@ -149,112 +359,389 @@ Como se puede observar, los participantes están, en su mayoría, en un peso IMC
 ### Presión sanguínea de los participantes
 
 ```{r}
+
+tabla_frecuencias_presion <- datos2 |> 
+
+  count(Blood.Pressure)|>
+  
+  mutate(
+    N = cumsum(n),              
+    f = round(n / nrow(datos2), 4), 
+    F = round(cumsum(f), 4)         
+  )
+
+flextable(tabla_frecuencias_presion) |>
+   flextable::set_header_labels(
+      Freq = "n",
+      f = "Frecuencia Relativa",
+      N = "Frecuencia Acumulada",
+      F = "Frecuencia Relativa Acumulada"
+  )
+
 datos2 |> 
-  mutate(Blood.Pressure = fct_rev(as_factor(Blood.Pressure))) |> 
   ggplot(aes(y = Blood.Pressure)) +
   geom_bar(fill = "#9dcb43") +
-  theme_bw() +
-  labs(title = "Niveles de presión",
-       x = expression("Frecuencia absoluta ("*n[i]*")"),
-       y = "Niveles")
-```
-
-```{r}
-tabla_frecuencias <- datos2 |> 
-  count(Blood.Pressure) |> 
-  mutate(f = n/nrow(datos2),
-         N = cumsum(n),
-         F = cumsum(f)) 
-knitr::kable(tabla_frecuencias, digits = 4)
-
-```
-
-## Frecuencia Cardiaca
-
-```{r}
-summary(datos2$Heart.Rate)
-datos2|>count(Heart.Rate)
-# Histograma para observar la distribución de la frecuencia cardiaca
-datos2 |> 
-  ggplot(aes(x = Heart.Rate)) +
-  geom_histogram(fill = "#9dcb43", bins = 21, color = "white") +
-  theme_bw() +
-  labs(title = "Distribución de la Frecuencia Cardiaca", 
-       x = "Frecuencia Cardiaca (bpm)", 
-       y = "Frecuencia Absoluta")
-```
-```{r}
-tabla_frecuencias_cardiaca <- datos2 |> 
-  count(Heart.Rate) |> 
-  mutate(f = n/nrow(datos2),
-         N = cumsum(n),
-         F = cumsum(f)) 
-knitr::kable(tabla_frecuencias_cardiaca, digits = 4)
-
-```
-
-### Pasos diarios con BMI
-```{r}
-rango <- max(datos2$Daily.Steps) - min(datos2$Daily.Steps)
-k <- round(rango / 5, 0)
-limit <- seq(0, max(datos2$Daily.Steps), by = k)
-
-datos2$Daily.Steps <- cut(datos2$Daily.Steps, breaks = c(0, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000), 
-                  labels = c('~3000', '~4000', '~5000', '~6000', '~7000', '~8000', '~9000', '10000'))
-
-datos2 |> ggplot(aes(x = Daily.Steps)) +   
-    geom_bar(fill = "#9dcb43", col = "white") +   
-    theme_bw() +
-    labs(title = "Distribución de Pasos Diarios",
-       x = expression("Pasos Diarios"),
-       y = "Frecuencia Absoluta")
-```
-```{r}
-tabla_frecuencias_pasos <- datos2 |> 
-  count(Daily.Steps) |> 
-  mutate(f = n/nrow(datos2),
-         N = cumsum(n),
-         F = cumsum(f)) 
-knitr::kable(tabla_frecuencias_pasos, digits = 4)
-
-```
-### Transtornos de Sueño
-```{r}
-datos2|>count(Sleep.Disorder)
-datos2 |> 
-  ggplot(aes(x = Sleep.Disorder)) +
-  geom_bar(fill = "#9dcb43") +
   theme_bw() + 
-  labs(title = "Transtornos del Sueño", 
-       x = "Tipos de Transtornos",
+  labs(title = "Presión sanguínea", 
+       x = "Presión",
        y = "Frecuencia absoluta")
+
+
+
+
 ```
+
 ## Datos bivariantes
 
-### Edad con horas de sueño
+### Covarianza y correlacion
+
+Covarianza
+
+```{r}
+
+datos2 |> select(where(is.numeric), -Person.ID) |> 
+  drop_na() |> 
+  cov() |> 
+  round(2) 
+```
+
+Correlación
+
+```{r}
+datos2 |> select(where(is.numeric), -Person.ID) |>  
+  drop_na() |>  
+  cor() |> 
+  round(2) 
+```
+
+Conclusión
+
+### Edad con duración del sueño
+
+```{r}
+
+edad_horas_de_sueño <- datos2 |> 
+  mutate(rango_edad = cut(Age, breaks = seq(floor(min(Age)), ceiling(max(Age)), by = 4), include.lowest = TRUE),
+         rango_horas_de_sueño=cut(Sleep.Duration,breaks=3)) |> 
+  count(rango_edad,
+        rango_horas_de_sueño)
+
+kable(edad_horas_de_sueño)
+
+
+```
+
+Covarianza
+
+```{r}
+
+cov(datos2$Age, datos2$Sleep.Duration)
+
+```
+
+Al resueltar una covarianza positiva presentan una relacion lineal positiva, creciendo conjuntamente.
+
+Corelación
+
+```{r}
+cor(datos2$Age, datos2$Sleep.Duration)
+
+```
+
+Al ser valor proximo a 0 no hay una relacion lineal fuerte entre ellas por lo que no se modifican notablemente los datos.
+
+Gráfica de dispersión
+
+```{r}
+
+
+datos2 |> 
+  ggplot(aes(x = Age, y = Sleep.Duration)) +
+  geom_point()
+
+
+```
+
+El gráfico de dispersion muestra la edad (eje x) frente a la duracion del sueño(eje Y). La dispersion muestra un leve crecimiento segun avanza la edad de los sujetos pero la mayoria de varores se centran entre las 6 y 8 horas. Algunos valores que superan las 8 horas son los sujetos que principalmente han superado los 50 años. Y los que no sus horas de sueño se encuentran por denajo de los 35 años y algun usuario de edad superior.
+
+Regresión lineal:
+
+```{r}
+
+datos2 |> 
+  ggplot(aes(x = Age, y = Sleep.Duration)) +
+  geom_point() +
+  geom_smooth(method = lm) 
+
+
+
+```
+
+```{r}
+
+
+edad_duracio_sueno <- lm(Age ~ Sleep.Duration, data = datos2)
+
+summary(edad_duracio_sueno)
+
+```
 
 ### Trastornos con la edad
 
+Tabla comparativa
+
+```{r}
+
+table(datos2$Age, datos2$Sleep.Disorder)
+
+
+```
+
+Gráfico de cajas:
+
+```{r}
+
+datos2 |> 
+  ggplot(aes(x = Sleep.Disorder, y = Age)) + 
+  geom_boxplot() + 
+  geom_jitter(aes(col = Sleep.Disorder), alpha = 0.2) +  
+  theme_bw() +  
+  labs(title = "Trastornos del sueño por edad") 
+```
+
+Grácias al grafico principalmente los sujetos no presentan algun tipo del trastorno del sueño en torno a los 30 y 40 años. Por otro lado el principal trastorno que se presenta principalmente en torno los 50 y 60 años en la Apnea del sueño y detras de este se encunetra el imsopnio que se presenta en un menor número de sujetos totales entre 40 y 45 años.
+
 ### Profesion con estres
 
-### Estres calidad de sueño
+Tabla comparativa
 
-### Profesion con BMI
+```{r}
 
-### BMI con presion
+table(datos2$Stress.Level, datos2$Occupation)
+
+
+```
+
+Gráfico de cajas:
+
+```{r}
+datos2 |> 
+  ggplot(aes(x = Occupation, y = Stress.Level)) + 
+  geom_boxplot() + 
+  geom_jitter(aes(col = Occupation), alpha = 0.2) +  
+  theme_bw() +  
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(title = "Profesión y estrés") 
+
+```
+
+Las profesiones que presentan un mayor nivel de estrés son las enfermeras y los médicos. Aquella cajas que son mas reducidas son las que han presentado un menor numero de sujetos encuestados respecto al resto.
+
+### Profesión BMI
+
+Tabla comparativa
+
+```{r}
+
+table(datos2$Occupation, datos2$BMI.Category)
+
+
+```
+
+Gráfico de barras
+
+```{r}
+datos2 |>
+  ggplot(aes(x = Occupation, fill = BMI.Category)) + 
+  geom_bar(position = position_dodge()) + 
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Podemos apreciar cómo la posición de enfermero tiene una cantidad mayor de individuos con sobrepeso que el resto, seguida por la posición de profesor y por la de vendedor. En la categoría normal, la posición de doctor es la que tiene más representantes.
 
 ### Horas de sueño con trastorno
 
-### Pasos diarios con BMI
+Tabla comparativa
 
-### Genero con trastornos
+```{r}
+table(datos2$Duración_sueño, datos2$Sleep.Disorder)
+```
+
+Gráfico de cajas
+
+```{r}
+datos2 |> 
+  ggplot(aes(x = Sleep.Disorder, y = Sleep.Duration)) + 
+  geom_boxplot() + 
+  geom_jitter(aes(col = Sleep.Disorder), alpha = 0.2) +  
+  theme_bw() +  
+  labs(title = "Horas de sueño por trastorno del sueño") 
+
+```
+
+Se muestra la relación entre las horas de sueño y el tipo de trastorno. La mayoría de los participantes sin trastornos de sueño tienen una duración media de sueño dentro del rango normal (7-8 horas). En el caso de los participantes con insomnio, las horas de sueño son considerablemente más bajas, mientras que aquellos con apnea del sueño suelen tener una duración más dispersa
 
 ### Calidad de sueño con estres
 
-### Actividad diaria con BMI
+```{r}
+
+calidad_de_sueño_estres <- datos2 |> 
+  mutate(rango_calidad = cut(Quality.of.Sleep, breaks = seq(floor(min(Quality.of.Sleep)), ceiling(max(Quality.of.Sleep)), by = 4), include.lowest = TRUE),
+         rango_estres=cut(Stress.Level,breaks=3)) |> 
+  count(rango_calidad,
+        rango_estres)
+
+kable(calidad_de_sueño_estres)
+
+
+```
+
+Covarianza
+
+```{r}
+
+cov(datos2$Quality.of.Sleep, datos2$Stress.Level)
+
+```
+
+Al resueltar una covarianza negativa presentan una relacion lineal negativa, creciendo una mientras la otra disminuye y viceversa.
+
+Corelación
+
+```{r}
+cor(datos2$Quality.of.Sleep, datos2$Stress.Level)
+
+```
+
+Al ser valor proximo a -1 hay una relacion lineal fuerte entre ellas por lo que se modifican notablemente los datos. Gráfica de dispersión
+
+```{r}
+
+
+datos2 |> 
+  ggplot(aes(x = Quality.of.Sleep, y = Stress.Level)) +
+  geom_point()
+
+
+```
+
+El gráfico de dispersion muestra la calidad del sueño (eje x) frente al nivel de estrés de los participantes(eje Y). La dispersión muestra un aumento de la calidad del sueño conforme disminuye el nivel de estrés, centrándose los valores en una calidad de sueño de 7 y 8 y un nivel de estrés de 4 a 6.
+
+Regresión lineal:
+
+```{r}
+
+datos2 |> 
+  ggplot(aes(x = Quality.of.Sleep, y = Stress.Level)) +
+  geom_point() +
+  geom_smooth(method = lm) 
+
+
+
+```
+
+```{r}
+
+
+calidad_de_sueño_estres <- lm(Quality.of.Sleep ~ Stress.Level, data = datos2)
+
+summary(calidad_de_sueño_estres)
+
+```
+
+### Pasos diarios con BMI
+
+Tabla comparativa
+
+```{r}
+
+table(datos2$Daily.Steps, datos2$BMI.Category)
+
+
+```
+
+Gráfico de cajas:
+
+```{r}
+
+datos2 |> 
+  ggplot(aes(x = BMI.Category, y = Daily.Steps)) + 
+  geom_boxplot() + 
+  geom_jitter(aes(col = BMI.Category), alpha = 0.2) +  
+  theme_bw() +  
+  labs(title = "Actividad diaria por categoría del IMC") 
+```
+
+En el gráfico se muestra aquellos con un BMI dentro del rango normal o bajo peso que tienden a realizar más pasos diarios en comparación con las personas que están en la categoría de obesidad
+
+### Actividad Física con BMI
+
+Tabla comparativa
+
+```{r}
+
+table(datos2$Physical.Activity.Level, datos2$BMI.Category)
+
+```
+
+Gráfico de cajas:
+
+```{r}
+
+datos2 |> 
+  ggplot(aes(x = BMI.Category, y = Physical.Activity.Level)) + 
+  geom_boxplot() + 
+  geom_jitter(aes(col = BMI.Category), alpha = 0.2) +  
+  theme_bw() +  
+  labs(title = "Actividad física por categoría del BMI") 
+```
+
+Gracias al gráfico, podemos ver que las personas con peso normal tienden a tener una mayor actividad física en comparación con las personas con obesidad, que muestran niveles de actividad más bajos
 
 ### Presion pulso BMI
 
+Tabla comparativa
+
+```{r}
+
+table(datos2$Blood.Pressure, datos2$BMI.Category)
+
+
+```
+
+Gráfico de barras
+
+```{r}
+datos2 |>
+  ggplot(aes(x = BMI.Category, fill = Blood.Pressure)) + 
+  geom_bar(position = position_dodge()) + 
+  theme_bw() 
+```
+
+Gracias a esta tabla podemos apreciar que cuanto más peso tienen los participantes, más inestable es la presión sanguínea, habiendo mayor variación.
+
 ### Trastorno trabajo
+
+Tabla comparativa
+
+```{r}
+
+table(datos2$Occupation, datos2$Sleep.Disorder)
+
+
+```
+
+Gráfico de barras
+
+```{r}
+datos2 |>
+  ggplot(aes(x = Occupation, fill = Sleep.Disorder)) + 
+  geom_bar(position = position_dodge()) + 
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Gracias a esta tabla podemos apreciar los diferentes trastornos de sueño que suelen tener las distintas profesiones. De este modo, vemos que los contables, los doctores, los ingenieros y los abogados no suelen presentar ningún trastorno, los enfermeros suelen presentar apnea del sueño y los vendedores y profesores presentan en muchos casos insomnia.
 
 # Conclusiones
